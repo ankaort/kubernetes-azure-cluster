@@ -1,0 +1,49 @@
+---
+# MongoDB Service (Headless for StatefulSet)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  labels:
+    app: mongodb
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+    name: mongodb
+  clusterIP: None
+  selector:
+    app: mongodb
+---
+# Redis Service (Headless for StatefulSet)
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+    name: redis
+  clusterIP: None
+  selector:
+    app: redis
+---
+# Jetty Service (LoadBalancer for external access)
+apiVersion: v1
+kind: Service
+metadata:
+  name: jetty
+  labels:
+    app: jetty
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: jetty

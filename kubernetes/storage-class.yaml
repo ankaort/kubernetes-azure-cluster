@@ -1,0 +1,39 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: azure-disk-standard
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: disk.csi.azure.com
+parameters:
+  skuName: StandardSSD_LRS
+  kind: Managed
+  cachingMode: ReadOnly
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: azure-disk-premium
+provisioner: disk.csi.azure.com
+parameters:
+  skuName: Premium_LRS
+  kind: Managed
+  cachingMode: ReadOnly
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: azure-blob
+provisioner: blob.csi.azure.com
+parameters:
+  protocol: fuse
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+allowVolumeExpansion: true

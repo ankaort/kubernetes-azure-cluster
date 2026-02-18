@@ -1,0 +1,80 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jetty-data
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: azure-disk-standard
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jetty
+  labels:
+    app: jetty
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jetty
+  template:
+    metadata:
+      labels:
+        app: jetty
+    spec:
+      containers:
+      - name: jetty
+        image: jetty:11-jre11
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: JETTY_BASE
+          value: /var/lib/jetty
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: jetty-data
+          mountPath: /var/lib/jetty/webapps
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+      volumes:
+      - name: jetty-data
+        persistentVolumeClaim:
+          claimName: jetty-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jetty
+  labels:
+    app: jetty
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: jetty
