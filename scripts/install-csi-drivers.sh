@@ -13,7 +13,7 @@ fi
 
 echo ""
 echo "Installing Azure Disk CSI Driver..."
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/master/deploy/install-driver.sh | bash
+curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/master/deploy/install-driver.sh | bash -s master --
 
 echo ""
 echo "Waiting for Azure Disk CSI Driver pods to be ready..."

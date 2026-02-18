@@ -182,9 +182,16 @@ resource "azurerm_lb_rule" "http" {
   probe_id                       = azurerm_lb_probe.k8s.id
 }
 
+# Random suffix for storage account name uniqueness
+resource "random_string" "storage_suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
 # Storage Account for Blob Storage
 resource "azurerm_storage_account" "k8s" {
-  name                     = lower(replace("${var.resource_group_name}storage", "-", ""))
+  name                     = substr(lower(replace("${var.resource_group_name}st${random_string.storage_suffix.result}", "-", "")), 0, 24)
   resource_group_name      = azurerm_resource_group.k8s.name
   location                 = azurerm_resource_group.k8s.location
   account_tier             = var.storage_account_tier
